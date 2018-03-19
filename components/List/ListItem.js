@@ -4,18 +4,13 @@ import { View, Text, TouchableHighlight, Image } from 'react-native';
 
 import styles from './styles';
 const ListItem = ({
-  text,
+  movie,
   onPress,
-  checkmark = true,
-  selected = false,
-  visible = true,
-  customIcon = null,
-  iconBackground,
 }) => (
   <TouchableHighlight onPress={onPress} underlayColor={styles.$underlayColor}>
     <View style={styles.container}>
     <Image style={styles.thumb} source = {{uri: 'http://image.tmdb.org/t/p/w185/vLCogyfQGxVLDC1gqUdNAIkc29L.jpg'}}/>
-      <Text style={styles.text}>{text}</Text>
+      <Text style={styles.text}>{movie.title}</Text>
     </View>
   </TouchableHighlight>
 );

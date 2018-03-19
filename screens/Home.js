@@ -1,27 +1,25 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { FlatList, StatusBar, View } from 'react-native';
+import { FlatList, StatusBar, View, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import currencies from '../data/currencies';
 import { ListItem, Separator } from '../components/List';
+import { fetchNewMovies, getInitialState } from '../actions/movies';
 
-import {fetchNewMovies} from '../actions/movies';
-
-class CurrencyList extends Component {
-  static propTypes = {
-    navigation: PropTypes.object,
-    dispatch: PropTypes.func,
-    baseCurrency: PropTypes.string,
-    quoteCurrency: PropTypes.string,
-  };
+class Home extends Component {
 
   onEndReach = () => {
     console.log("wtf", "onEndReach");
   }
 
-  componentWillMount(){
+  componentWillMount() {
     console.log("fetch new movies");
+    this.props.dispatch(getInitialState());
     this.props.dispatch(fetchNewMovies());
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log("wtf", "component will receive props:" + nextProps);
   }
 
   handlePress = (currency) => {
@@ -36,37 +34,40 @@ class CurrencyList extends Component {
   };
 
   render() {
-    // let comparisonCurrency = this.props.baseCurrency;
-    // if (this.props.navigation.state.params.type === 'quote') {
-    //   comparisonCurrency = this.props.quoteCurrency;
-    // }
-
-    return (
-      <View style={{ flex: 1 }}>
-        <StatusBar translucent={false} barStyle="default" />
-        <FlatList
-          data={currencies}
-          renderItem={({ item }) => (
-            <ListItem
-              text={item}
-              // selected={item === comparisonCurrency}
-              onPress={() => this.handlePress(item)}
-              iconBackground={this.props.primaryColor}
-            />
-          )}
-          keyExtractor={item => item}
-          ItemSeparatorComponent={Separator}
-          onEndReached ={this.onEndReach}
-        />
-      </View>
-    );
+    console.log("wtf", "movies length: " + this.props.movies);
+    if (!this.props.movies[1]) {
+      return (
+        <ActivityIndicator size="large" color="#0000ff" />
+      )
+    } else {
+      return (
+        <View style={{ flex: 1 }}>
+          <StatusBar translucent={false} barStyle="default" />
+          <FlatList
+            data={this.props.movies}
+            renderItem={({ item }) => (
+              <ListItem
+                movie={item}
+                // selected={item === comparisonCurrency}
+                onPress={() => this.handlePress(item)}
+                iconBackground={this.props.primaryColor}
+              />
+            )}
+            keyExtractor={item => item}
+            ItemSeparatorComponent={Separator}
+            onEndReached={this.onEndReach}
+          />
+        </View>
+      );
+    }
   }
 }
 
-const mapStateToProps = state => ({
-  baseCurrency: state.currencies.baseCurrency,
-  quoteCurrency: state.currencies.quoteCurrency,
-  primaryColor: state.theme.primaryColor,
-});
+const mapStateToProps = state => {
+  console.log("wtf", "map state to props");
+  return {
+    movies : state.movies,
+  }
+}
 
-export default connect(mapStateToProps)(CurrencyList);
+export default connect(mapStateToProps)(Home);
