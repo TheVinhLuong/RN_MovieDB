@@ -3,19 +3,25 @@ import React, { Component } from 'react';
 import { FlatList, StatusBar, View, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import currencies from '../data/currencies';
+import { connectAlert } from '../components/Alert';
 import { ListItem, Separator } from '../components/List';
 import { fetchNewMovies, getInitialState } from '../actions/movies';
 
 class Home extends Component {
+  static propTypes = {
+    isLoading: PropTypes.bool,
+    currentPage: PropTypes.number,
+  };
 
   onEndReach = () => {
     console.log("wtf", "onEndReach");
+    this.props.dispatch(fetchNewMovies(this.props.currentPage));
   }
 
   componentWillMount() {
-    console.log("fetch new movies");
+    console.log("wtf", "component will mount: " + this.props.currentPage);
     this.props.dispatch(getInitialState());
-    this.props.dispatch(fetchNewMovies());
+    this.props.dispatch(fetchNewMovies(this.props.currentPage));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -35,7 +41,8 @@ class Home extends Component {
 
   render() {
     console.log("wtf", "movies length: " + this.props.movies);
-    if (!this.props.movies[1]) {
+    console.log("wtf", "loading status: " + this.props.isLoading);
+    if (this.props.isLoading) {
       return (
         <ActivityIndicator size="large" color="#0000ff" />
       )
@@ -63,11 +70,14 @@ class Home extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  console.log("wtf", "map state to props");
+const mapStateToProps = (state) => {
+  const isLoading = state.isLoading;
+  console.log("wtf", "map state to props:" + isLoading);
   return {
     movies : state.movies,
-  }
-}
+    isLoading,
+    currentPage: state.currentPage,
+  };
+};
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps)(connectAlert(Home));
