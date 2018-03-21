@@ -71,12 +71,12 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const isLoading = state.isLoading;
+  const isLoading = state.movies.isLoading;
   console.log("wtf", "map state to props:" + isLoading);
   return {
-    movies : state.movies,
+    movies : state.movies.movies,
     isLoading,
-    currentPage: state.currentPage,
+    currentPage: state.movies.currentPage,
   };
 };
 
