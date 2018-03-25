@@ -53,6 +53,7 @@ class Home extends Component {
           onEndReached={this.onEndReach}
           onEndReachedThreshold={0.8}
           bounces={false}
+          scrollsToTop={false}
         />
       </View>
     );
@@ -60,11 +61,11 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const isLoading = state.isLoading;
+  const isLoading = state.movies.isLoading;
   return {
-    movies: state.movies,
+    movies: state.movies.movies,
     isLoading,
-    currentPage: state.currentPage,
+    currentPage: state.movies.currentPage,
   };
 };
 

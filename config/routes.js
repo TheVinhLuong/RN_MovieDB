@@ -1,8 +1,9 @@
 import { StatusBar } from 'react-native';
-import { TabNavigator, StackNavigator } from 'react-navigation';
+import { TabNavigator, StackNavigator, DrawerNavigator } from 'react-navigation';
 
 import Home from '../screens/Home';
 import MovieDetail from '../screens/MovieDetail';
+import DrawerItem from '../screens/DrawerItem'
 
 // const HomeStack = StackNavigator(
 //   {
@@ -27,13 +28,30 @@ const TabNavigation = TabNavigator(
     Home1: {
       screen: Home,
     },
+  },
+  {
+    tabBarPosition: 'bottom',
+  }
+);
+
+const DrawerNavigation = DrawerNavigator(
+  {
+    TabScreen: {
+      screen: TabNavigation,
+    },
+    DrawerItem: {
+      screen: DrawerItem,
+    }
+  },
+  {
+    initialRouteName: 'TabScreen',
   }
 );
 
 export default StackNavigator(
   {
-    Tab: {
-      screen: TabNavigation,
+    DrawerScreens: {
+      screen: DrawerNavigation,
     },
     MovieDetail: {
       screen: MovieDetail,
