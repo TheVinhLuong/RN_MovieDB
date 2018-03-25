@@ -14,8 +14,10 @@ class Home extends Component {
   };
 
   onEndReach = () => {
-    console.log("wtf", "onEndReach");
-    this.props.dispatch(fetchNewMovies(this.props.currentPage));
+    if (!this.props.isLoading) {
+      console.log("wtf", "onEndReach");
+      this.props.dispatch(fetchNewMovies(this.props.currentPage));
+    }
   }
 
   componentWillMount() {
@@ -28,56 +30,44 @@ class Home extends Component {
     console.log("wtf", "component will receive props:" + nextProps);
   }
 
-  handlePress = (currency) => {
-    // const { type } = this.props.navigation.state.params;
-    // if (type === 'base') {
-    //   this.props.dispatch(changeBaseCurrency(currency));
-    // } else if (type === 'quote') {
-    //   this.props.dispatch(changeQuoteCurrency(currency));
-    // }
-
-    // this.props.navigation.goBack(null);
+  handlePress = (movie) => {
+    this.props.navigation.navigate("MovieDetail", {movie: movie});
   };
 
   render() {
-    console.log("wtf", "movies length: " + this.props.movies);
-    console.log("wtf", "loading status: " + this.props.isLoading);
-    if (this.props.isLoading) {
-      return (
-        <ActivityIndicator size="large" color="#0000ff" />
-      )
-    } else {
-      return (
-        <View style={{ flex: 1 }}>
-          <StatusBar translucent={false} barStyle="default" />
-          <FlatList
-            data={this.props.movies}
-            renderItem={({ item }) => (
-              <ListItem
-                movie={item}
-                // selected={item === comparisonCurrency}
-                onPress={() => this.handlePress(item)}
-                iconBackground={this.props.primaryColor}
-              />
-            )}
-            keyExtractor={item => item}
-            ItemSeparatorComponent={Separator}
-            onEndReached={this.onEndReach}
-          />
-        </View>
-      );
-    }
+    return (
+      <View style={{ flex: 1 }}>
+        <FlatList style={{flex:1, paddingTop:0}}
+          automaticallyAdjustContentInsets={false}
+          data={this.props.movies}
+          renderItem={({ item }) => (
+            <ListItem
+              movie={item}
+              // selected={item === comparisonCurrency}
+              onPress={() => this.handlePress(item)}
+              iconBackground={this.props.primaryColor}
+            />
+          )}
+          keyExtractor={item => item.id}
+          ItemSeparatorComponent={Separator}
+          onEndReached={this.onEndReach}
+          onEndReachedThreshold={0.8}
+          bounces={false}
+        />
+      </View>
+    );
   }
 }
 
 const mapStateToProps = (state) => {
   const isLoading = state.isLoading;
-  console.log("wtf", "map state to props:" + isLoading);
   return {
-    movies : state.movies,
+    movies: state.movies,
     isLoading,
     currentPage: state.currentPage,
   };
 };
 
 export default connect(mapStateToProps)(connectAlert(Home));
+
+
