@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import currencies from '../data/currencies';
 import { connectAlert } from '../components/Alert';
 import { ListItem, Separator } from '../components/List';
-import { fetchNewMovies, getInitialState } from '../actions/movies';
+import { fetchNewMovies, getInitialState, getOnScrollEnd } from '../actions/movies';
 
 class Home extends Component {
   static propTypes = {
@@ -14,70 +14,100 @@ class Home extends Component {
   };
 
   onEndReach = () => {
-    console.log("wtf", "onEndReach");
-    this.props.dispatch(fetchNewMovies(this.props.currentPage));
+    if (!this.props.isLoading) {
+      console.log("wtf", "onEndReach");
+      this.props.dispatch(fetchNewMovies(this.props.currentPage));
+    }
   }
 
   componentWillMount() {
-    console.log("wtf", "component will mount: " + this.props.currentPage);
-    this.props.dispatch(getInitialState());
-    this.props.dispatch(fetchNewMovies(this.props.currentPage));
+    if (!this.props.componentDidMount) {
+      console.log("wtf", "component NOT mount");
+      this.props.dispatch(getInitialState());
+      this.props.dispatch(fetchNewMovies(this.props.currentPage));
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.componentDidMount) {
+      let offset = {
+        offset: this.props.listOffset.y,
+        animated: false
+      }
+    
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("wtf", "component will receive props:" + nextProps);
+
   }
 
-  handlePress = (currency) => {
-    // const { type } = this.props.navigation.state.params;
-    // if (type === 'base') {
-    //   this.props.dispatch(changeBaseCurrency(currency));
-    // } else if (type === 'quote') {
-    //   this.props.dispatch(changeQuoteCurrency(currency));
-    // }
-
-    // this.props.navigation.goBack(null);
+  handlePress = (movie) => {
+    this.props.navigation.navigate("MovieDetail", { movie: movie });
   };
 
-  render() {
-    console.log("wtf", "movies length: " + this.props.movies);
-    console.log("wtf", "loading status: " + this.props.isLoading);
-    if (this.props.isLoading) {
-      return (
-        <ActivityIndicator size="large" color="#0000ff" />
-      )
-    } else {
-      return (
-        <View style={{ flex: 1 }}>
-          <StatusBar translucent={false} barStyle="default" />
-          <FlatList
-            data={this.props.movies}
-            renderItem={({ item }) => (
-              <ListItem
-                movie={item}
-                // selected={item === comparisonCurrency}
-                onPress={() => this.handlePress(item)}
-                iconBackground={this.props.primaryColor}
-              />
-            )}
-            keyExtractor={item => item}
-            ItemSeparatorComponent={Separator}
-            onEndReached={this.onEndReach}
-          />
-        </View>
-      );
+  handleScrollEnd = (event) => {
+    console.log("wtf", "y: " + event.nativeEvent.contentOffset.y)
+    this.props.dispatch(getOnScrollEnd(event.nativeEvent.contentOffset))
+  }
+
+  onLayoutRender = (event) => {
+    if (this.props.componentDidMount) {
+      let offset = {
+        offset: this.props.listOffset.y,
+        animated: false
+      }
+      console.log("wtf", "layoutrender: " + JSON.stringify(offset));
+      this.refs.listRef.scrollToOffset(offset);
     }
+  }
+
+  render() {
+    console.log("wtf", "list offset: " + JSON.stringify(this.props.listOffset));
+    return (
+      <View style={{ flex: 1 }}>
+        <FlatList style={{ flex: 1, paddingTop: 0 }}
+          ref="listRef"
+          data={this.props.movies}
+          onLayout={this.onLayoutRender}
+          renderItem={({ item }) => (
+            <ListItem
+              movie={item}
+              onPress={() => this.handlePress(item)}
+              iconBackground={this.props.primaryColor}
+            />
+          )}
+          keyExtractor={item => item.id}
+          ItemSeparatorComponent={Separator}
+          onEndReached={this.onEndReach}
+          onEndReachedThreshold={1.0}
+          bounces={false}
+          // scrollToOffSet={{x:0,y:37.66666793823242}}
+          onScroll={this.handleScrollEnd}
+        />
+      </View>
+    );
+  }
+
+  componentWillUnmount() {
+
+  }
+
+  componentDidUpdate() {
+
   }
 }
 
 const mapStateToProps = (state) => {
   const isLoading = state.movies.isLoading;
-  console.log("wtf", "map state to props:" + isLoading);
   return {
-    movies : state.movies.movies,
+    movies: state.movies.movies,
     isLoading,
     currentPage: state.movies.currentPage,
+    componentDidMount: state.movies.componentDidMount,
+    listOffset: state.movies.listOffset,
   };
 };
 
-export default connect(mapStateToProps)(connectAlert(Home));
+export default connect(mapStateToProps, null, null, { withRef: true })(connectAlert(Home));
+
