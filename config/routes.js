@@ -60,9 +60,15 @@ export default StackNavigator(
     }
   },
   {
-    headerMode: 'None',
-    navigationOptions: {
-      headerVisible: false,
+    headerMode: 'float',
+    navigationOptions:{
+      headerStyle: {
+        backgroundColor: '#f4511e',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
     }
   }
 )

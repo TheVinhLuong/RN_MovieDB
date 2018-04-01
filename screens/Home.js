@@ -34,7 +34,7 @@ class Home extends Component {
         offset: this.props.listOffset.y,
         animated: false
       }
-    
+
     }
   }
 
@@ -77,7 +77,7 @@ class Home extends Component {
               iconBackground={this.props.primaryColor}
             />
           )}
-          keyExtractor={item => item.id}
+          keyExtractor={item => String(item.id)}
           ItemSeparatorComponent={Separator}
           onEndReached={this.onEndReach}
           onEndReachedThreshold={1.0}
